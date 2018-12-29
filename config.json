@@ -1,6 +1,6 @@
 {
 	"threads": 2,
-	"coin": "eth",
+	"coin": "eth", //coin adına göre pool sıfırlanır
 	"name": "main",
 
 	"proxy": {
@@ -63,12 +63,12 @@
 	"upstream": [
 		{
 			"name": "main",
-			"url": "http://127.0.0.1:8545",
+			"url": "http://127.0.0.1:8545",//geth rpc portu öğren değiştir
 			"timeout": "10s"
 		},
 		{
 			"name": "backup",
-			"url": "http://127.0.0.2:8545",
+			"url": "http://127.0.0.2:8545",//geth rpc portu öğren değiştir
 			"timeout": "10s"
 		}
 	],
@@ -81,25 +81,25 @@
 	},
 
 	"unlocker": {
-		"enabled": false,
-		"poolFee": 1.0,
-		"poolFeeAddress": "",
+		"enabled": false, //true yap
+		"poolFee": 1.0, //
+		"poolFeeAddress": "", //pool fee gidecek adres
 		"donate": true,
 		"depth": 120,
 		"immatureDepth": 20,
 		"keepTxFees": false,
 		"interval": "10m",
-		"daemon": "http://127.0.0.1:8545",
+		"daemon": "http://127.0.0.1:8545",//geth rpc portu öğren değiştir
 		"timeout": "10s"
 	},
 
 	"payouts": {
-		"enabled": false,
-		"requirePeers": 25,
-		"interval": "120m",
-		"daemon": "http://127.0.0.1:8545",
+		"enabled": false, //ödeme true yap
+		"requirePeers": 25, //ödeme için node bağlı kişi sayısı
+		"interval": "120m", //ödeme süresi
+		"daemon": "http://127.0.0.1:8545", //geth rpc portu öğren değiştir
 		"timeout": "10s",
-		"address": "0x0",
+		"address": "0x0",//pool fee gidecek adres
 		"gas": "21000",
 		"gasPrice": "50000000000",
 		"autoGas": true,
