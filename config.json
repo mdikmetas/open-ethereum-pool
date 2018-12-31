@@ -103,7 +103,7 @@
 		"gas": "21000",
 		"gasPrice": "50000000000",
 		"autoGas": true,
-		"threshold": 500000000,
+		"threshold": 500000000, // 0.5 odeme yapar 1 yazarsan 0.1 odeme alırsın
 		"bgsave": false
 	},
 
