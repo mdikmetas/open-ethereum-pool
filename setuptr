@@ -1,0 +1,204 @@
+sudo apt-get update
+sudo apt-get install git
+sudo apt-get install npm
+sudo apt-get install redis-server
+sudo apt-get install build-essential
+sudo apt-get install nodejs
+sudo npm install -g bower
+sudo apt-get install nginx
+sudo apt-get install python-twisted
+sudo apt-get install nodejs-legacy
+sudo apt-get install software-properties-common
+sudo add-apt-repository -y ppa:ethereum/ethereum
+sudo apt-get update
+sudo apt-get install ethereum
+
+
+
+sudo add-apt-repository ppa:longsleep/golang-backports
+sudo apt-get update
+sudo apt-get install golang-go
+
+
+
+git clone https://github.com/sammy007/open-ethereum-pool.git
+cd open-ethereum-pool
+make
+
+
+
+
+----------------------------------------------------
+örnek balzcoin kurulumu
+
+-----------------
+cd coins 
+git clone https://github.com/ballzcoin/ballzcoin.git
+cd ballzcoin
+make
+-----------------
+build edilen coin varsa buna gerek yoktu.
+
+
+cüzdan oluşturmak
+------------------------------------------------------
+cd build/bin
+./ballzcoin console --rpc
+
+personal.newAccount()
+Passphrase:mypass12
+Repeat passphrase:mypass12
+
+"0x980722586912fa3342e90f31fd54c421fd6dd3e5"
+
+CTRL + B CTRL + D
+--------------------------------------------------------------
+
+Cüzdanı tekrardan verilen adresle çalıştır ve serverle eşitlenmesini bekle.
+
+./ballzcoin console --rpc --rpcaddr 127.0.0.1 --rpcport 8641 --cache=4096 --etherbase 0x980722586912fa3342e90f31fd54c421fd6dd3e5 –-password mypass12 --unlock 0
+
+
+-------------------------------------------------------------------------------------
+
+ikinci bir konsol aç ve pools klasörüne gir. open-ethereum-pool arayüzü kodlarını indir, sonra derlemeyi başlat.
+
+cd pools
+git clone https://github.com/sammy007/open-ethereum-pool.git
+cd open-ethereum-pool
+make
+
+----------------------------------------------------------------------------------------
+örnek config.example.json adlı dosyayı build/bin klasörüne kopyala ve config.json olarak değiştir
+8545 portları 8641 olarak değiştir (Ballzcoin portu)
+Code:
+
+cp ~/pools/open-ethereum-pool/config.example.json ~/pools/open-ethereum-pool/build/bin/config.json
+
+----------------------------------------------------------------------------------------------
+
+sonra environment.js dosyasını düzenle
+
+open-ethereum-pool/www/config/environment.js
+
+example.net yazan yerlere kendi serverinin ip adresini yaz
+
+
+Code:
+
+    APP: {
+      // API host and port
+      ApiUrl: '//192.168.1.70/',
+
+      // HTTP mining endpoint
+      HttpHost: 'http://192.168.1.70',
+      HttpPort: 8888,
+
+      // Stratum mining endpoint
+      StratumHost: '192.168.1.70',
+      StratumPort: 8008,
+
+-----------------------------------------------------------------------------------------------
+www klasörüne gir ve derleme işlerini tamamla.
+
+cd ~/pools/open-ethereum-pool/www
+
+npm install -g ember-cli@2.9.1
+npm install -g bower
+npm install
+bower install
+./build.sh
+--------------------------------------------------------------------------------------------------
+
+web arayüzü için nginx dosyasını düzenle (hepsini sil ve aşağıdaki kodları ekle)
+
+sudo nano /etc/nginx/sites-enabled/default
+
+
+Code:
+
+####
+upstream api {
+server 127.0.0.1:8080;
+}
+
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+#       root /var/www/html;
+#       root /home/miner/pools/myztic-pool/pool_website;
+        root /home/kullanıcıadı/pools/open-ethereum-pool/www/dist;
+
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name _;
+
+        location / {
+                # First attempt to serve request as file, then
+                # as directory, then fall back to displaying a 404.
+                try_files $uri $uri/ =404;
+        }
+
+  location /api {
+    proxy_pass http://api;
+  }
+}
+####
+
+
+ctrl+x ve yes enter
+------------------------------------------------------------------------
+Yapılan değişikleri webserver yeniden yüklesin
+
+Code:
+
+sudo service nginx reload
+
+----------------------------------------------------------------------------------------
+daha sonra build/bin klasörü içinde open-ethereum-pool'u çalıştır
+
+Code:
+
+cd ~/pools/open-ethereum-pool/build/bin/
+./open-ethereum-pool config.json
+------------------------------------------------------------------------------------------
+
+çalıştırılınca görülecek olan kodlar
+
+miner@vivopc:~/pools/open-ethereum-pool/build/bin$ ./open-ethereum-pool config.json
+2018/10/10 10:10:57 Loading config: /home/miner/pools/open-ethereum-pool/build/bin/config.json
+2018/10/10 10:10:57 Running with 2 threads
+2018/10/10 10:10:57 Backend check reply: PONG
+2018/10/10 10:10:57 Starting API on 0.0.0.0:8080
+2018/10/10 10:10:57 Set stats collect interval to 5s
+2018/10/10 10:10:57 Set purge interval to 10m0s
+2018/10/10 10:10:57 Purged stale stats from backend, 0 shares affected, elapsed time 345.218µs
+2018/10/10 10:10:57 Policy state refresh complete
+2018/10/10 10:10:57 Set policy stats reset every 1h0m0s
+2018/10/10 10:10:57 Set policy state refresh every 1m0s
+2018/10/10 10:10:57 Running with 8 policy workers
+2018/10/10 10:10:57 Upstream: main => http://127.0.0.1:8641
+2018/10/10 10:10:57 Upstream: backup => http://127.0.0.2:8641
+2018/10/10 10:10:57 Default upstream: main => http://127.0.0.1:8641
+2018/10/10 10:10:57 Stratum listening on 0.0.0.0:8008
+2018/10/10 10:10:57 Stats collection finished 403.652µs
+2018/10/10 10:10:57 New block to mine on main at height 147139 / 0x9aeca08a
+2018/10/10 10:10:57 Set block refresh every 120ms
+2018/10/10 10:10:57 Starting proxy on 0.0.0.0:8888
+2018/10/10 10:10:57 Broadcasting new job to 0 stratum miners
+2018/10/10 10:10:57 Jobs broadcast finished 7.135µs
+2018/10/10 10:11:02 Stats collection finished 968.655µs
+
+-----------------------------------------------------------------
+mining yapılacak cihazla bir test aşağıdaki gibi yapılabilir.
+
+Code:
+
+./ethminer http://192.168.1.70:8888/0x980722586912fa3342e90f31fd54c421fd6dd3e5/rig2 -G --farm-recheck 200
+
+
+Code:
+
+2018/10/10 10:11:08 Stats collection finished 576.314µs
+2018/10/10 10:11:10 Valid share from 0x980722586912fa3342e90f31fd54c421fd6dd3e5@192.168.1.70
